@@ -1,0 +1,285 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .wrap { padding: 1.5rem 0; }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 10px; }
+  .top-bar h2 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  .controls select { font-size: 13px; padding: 5px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+
+  .btn-add { font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+  .btn-add:hover { background: var(--color-background-secondary); }
+
+  .sop-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+  .sop-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; }
+  .sop-card .step-num { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .sop-card .step-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .sop-card .step-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { border-bottom: 0.5px solid var(--color-border-secondary); }
+  thead th { text-align: left; padding: 8px 10px; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+  tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); transition: background 0.15s; }
+  tbody tr:hover { background: var(--color-background-secondary); }
+  tbody td { padding: 8px 10px; vertical-align: top; color: var(--color-text-primary); }
+
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .badge-dm    { background: #E6F1FB; color: #0C447C; }
+  .badge-ig    { background: #FBEAF0; color: #72243E; }
+  .badge-fb    { background: #EEEDFE; color: #3C3489; }
+  .badge-ec    { background: #EAF3DE; color: #27500A; }
+  .badge-other { background: #F1EFE8; color: #444441; }
+
+  .status-select { font-size: 12px; padding: 3px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; width: 100%; }
+
+  .note-input { font-size: 12px; padding: 3px 7px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-primary); width: 100%; min-width: 80px; }
+  .note-input:focus { outline: none; border-color: var(--color-border-primary); }
+
+  .sop-tag { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 20px; font-weight: 500; margin-right: 3px; }
+  .sop1 { background: #FAEEDA; color: #633806; }
+  .sop2 { background: #E6F1FB; color: #0C447C; }
+  .sop3 { background: #EAF3DE; color: #27500A; }
+
+  .del-btn { font-size: 12px; color: var(--color-text-tertiary); border: none; background: none; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+  .del-btn:hover { color: #A32D2D; background: #FCEBEB; }
+
+  .empty-row td { text-align: center; color: var(--color-text-tertiary); padding: 2rem; font-size: 13px; }
+
+  .stats { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .stat-pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+  .stat-pill span { font-weight: 500; color: var(--color-text-primary); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; z-index: 100; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-secondary); padding: 1.5rem; width: 360px; max-width: 95vw; }
+  .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
+  .field-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .field-row label { font-size: 12px; color: var(--color-text-secondary); }
+  .field-row input, .field-row select { font-size: 13px; padding: 6px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+  .btn-cancel { font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+  .btn-confirm { font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+  .btn-confirm:hover { background: var(--color-background-secondary); }
+</style>
+
+<div class="wrap">
+  <div class="sop-strip">
+    <div class="sop-card">
+      <div class="step-num">SOP 步驟 1</div>
+      <div class="step-title">收到私訊</div>
+      <div class="step-desc">確認客訴內容與情緒強度，記錄平台來源，3 分鐘內先給「已收到」回應安撫情緒。</div>
+    </div>
+    <div class="sop-card">
+      <div class="step-num">SOP 步驟 2</div>
+      <div class="step-title">評估退換貨</div>
+      <div class="step-desc">判斷退貨／換貨／補贈，依品牌政策決定方案，回覆具體處理方式，設期限承諾。</div>
+    </div>
+    <div class="sop-card">
+      <div class="step-num">SOP 步驟 3</div>
+      <div class="step-title">結案確認</div>
+      <div class="step-desc">完成退換貨後主動跟進確認，留存紀錄，評估是否進行信任修復加碼行動。</div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <h2>客訴追蹤紀錄</h2>
+    <div class="controls">
+      <select id="filter-status" onchange="renderTable()">
+        <option value="">全部狀態</option>
+        <option value="私訊中">私訊中</option>
+        <option value="評估退貨">評估退貨</option>
+        <option value="評估不退貨">評估不退貨</option>
+        <option value="已完成">已完成</option>
+      </select>
+      <select id="filter-sop" onchange="renderTable()">
+        <option value="">全部 SOP</option>
+        <option value="1">步驟 1</option>
+        <option value="2">步驟 2</option>
+        <option value="3">步驟 3</option>
+      </select>
+      <button class="btn-add" onclick="openModal()">＋ 新增案件</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats-bar"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">日期</th>
+        <th style="width:80px">客戶名稱</th>
+        <th style="width:72px">平台</th>
+        <th style="width:130px">問題摘要</th>
+        <th style="width:80px">SOP 進度</th>
+        <th style="width:90px">退貨狀態</th>
+        <th>備註</th>
+        <th style="width:28px"></th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>新增客訴案件</h3>
+    <div class="field-row">
+      <label>客戶名稱</label>
+      <input id="m-name" type="text" placeholder="例：王小明" />
+    </div>
+    <div class="field-row">
+      <label>平台</label>
+      <select id="m-platform">
+        <option value="私訊">私訊（DM）</option>
+        <option value="IG">IG</option>
+        <option value="FB">FB</option>
+        <option value="電商">電商評論</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label>問題摘要</label>
+      <input id="m-issue" type="text" placeholder="例：零食開封發霉" />
+    </div>
+    <div class="field-row">
+      <label>SOP 進度</label>
+      <select id="m-sop">
+        <option value="1">步驟 1：收到私訊</option>
+        <option value="2">步驟 2：評估退換貨</option>
+        <option value="3">步驟 3：結案確認</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label>退貨狀態</label>
+      <select id="m-status">
+        <option value="私訊中">私訊中</option>
+        <option value="評估退貨">評估退貨</option>
+        <option value="評估不退貨">評估不退貨</option>
+        <option value="已完成">已完成</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label>備註</label>
+      <input id="m-note" type="text" placeholder="選填" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-confirm" onclick="addCase()">新增</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PLATFORM_BADGE = {
+    '私訊': 'badge-dm', 'IG': 'badge-ig', 'FB': 'badge-fb', '電商': 'badge-ec', '其他': 'badge-other'
+  };
+  const PLATFORM_LABEL = { '私訊': 'DM 私訊', 'IG': 'IG', 'FB': 'FB', '電商': '電商', '其他': '其他' };
+
+  let cases = [
+    { id: 1, date: '2025/04/20', name: '王小明', platform: '私訊', issue: '零食開封發霉', sop: '2', status: '評估退貨', note: '已附照片' },
+    { id: 2, date: '2025/04/21', name: '李美華', platform: 'IG', issue: '狗罐頭異味', sop: '1', status: '私訊中', note: '' },
+    { id: 3, date: '2025/04/22', name: '陳大偉', platform: '電商', issue: '包裝破損漏液', sop: '3', status: '已完成', note: '補送新品 + 道歉卡' },
+  ];
+  let nextId = 4;
+
+  function today() {
+    const d = new Date();
+    return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function sopLabel(n) {
+    const m = { '1': ['sop1','步驟 1'], '2': ['sop2','步驟 2'], '3': ['sop3','步驟 3'] };
+    return m[n] || ['sop1','步驟 1'];
+  }
+
+  function renderStats() {
+    const total = cases.length;
+    const done = cases.filter(c => c.status === '已完成').length;
+    const ongoing = cases.filter(c => c.status !== '已完成').length;
+    const refund = cases.filter(c => c.status === '評估退貨').length;
+    document.getElementById('stats-bar').innerHTML =
+      `<div class="stat-pill">總計 <span>${total}</span> 件</div>` +
+      `<div class="stat-pill">處理中 <span>${ongoing}</span> 件</div>` +
+      `<div class="stat-pill">退貨評估 <span>${refund}</span> 件</div>` +
+      `<div class="stat-pill">已完成 <span>${done}</span> 件</div>`;
+  }
+
+  function renderTable() {
+    const sf = document.getElementById('filter-status').value;
+    const sp = document.getElementById('filter-sop').value;
+    let filtered = cases.filter(c => (!sf || c.status === sf) && (!sp || c.sop === sp));
+    const tbody = document.getElementById('table-body');
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="8">目前沒有符合條件的案件</td></tr>';
+    } else {
+      tbody.innerHTML = filtered.map(c => {
+        const pb = PLATFORM_BADGE[c.platform] || 'badge-other';
+        const pl = PLATFORM_LABEL[c.platform] || c.platform;
+        const [sc, sl] = sopLabel(c.sop);
+        return `<tr>
+          <td style="color:var(--color-text-secondary);white-space:nowrap">${c.date}</td>
+          <td style="font-weight:500">${esc(c.name)}</td>
+          <td><span class="badge ${pb}">${pl}</span></td>
+          <td>${esc(c.issue)}</td>
+          <td><span class="sop-tag ${sc}">${sl}</span></td>
+          <td>
+            <select class="status-select" data-id="${c.id}" onchange="updateStatus(this)">
+              ${['私訊中','評估退貨','評估不退貨','已完成'].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}
+            </select>
+          </td>
+          <td><input class="note-input" data-id="${c.id}" value="${esc(c.note)}" placeholder="備註…" onchange="updateNote(this)" /></td>
+          <td><button class="del-btn" onclick="deleteCase(${c.id})">✕</button></td>
+        </tr>`;
+      }).join('');
+    }
+    renderStats();
+  }
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function updateStatus(el) {
+    const id = +el.dataset.id;
+    const c = cases.find(x => x.id === id);
+    if (c) { c.status = el.value; renderStats(); }
+  }
+
+  function updateNote(el) {
+    const id = +el.dataset.id;
+    const c = cases.find(x => x.id === id);
+    if (c) c.note = el.value;
+  }
+
+  function deleteCase(id) {
+    cases = cases.filter(c => c.id !== id);
+    renderTable();
+  }
+
+  function openModal() { document.getElementById('modal').classList.add('open'); }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+  function addCase() {
+    const name = document.getElementById('m-name').value.trim();
+    const issue = document.getElementById('m-issue').value.trim();
+    if (!name || !issue) return;
+    cases.unshift({
+      id: nextId++,
+      date: today(),
+      name,
+      platform: document.getElementById('m-platform').value,
+      issue,
+      sop: document.getElementById('m-sop').value,
+      status: document.getElementById('m-status').value,
+      note: document.getElementById('m-note').value.trim()
+    });
+    closeModal();
+    document.getElementById('m-name').value = '';
+    document.getElementById('m-issue').value = '';
+    document.getElementById('m-note').value = '';
+    renderTable();
+  }
+
+  renderTable();
+</script>
